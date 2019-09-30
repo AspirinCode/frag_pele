@@ -12,7 +12,7 @@ import subprocess
 import traceback
 # Local imports
 from frag_pele.Helpers import clusterizer, checker, folder_handler, runner, constraints, check_constants
-from frag_pele.Helpers import helpers, correct_fragment_names, center_of_mass
+from frag_pele.Helpers import helpers, correct_fragment_names, center_of_mass, cluster
 from frag_pele.Growing import template_fragmenter, simulations_linker
 from frag_pele.Growing import add_fragment_from_pdbs, bestStructs
 from frag_pele.Analysis import analyser
@@ -463,6 +463,14 @@ def main(complex_pdb, fragment_pdb, core_atom, fragment_atom, iterations, criter
     # COMPUTE AND SAVE THE SCORE
     analyser.analyse_at_epoch(report_prefix=report, path_to_equilibration=equilibration_path,
                          column=criteria, quantile_value=0.25)
+    
+    
+    # CLUSTERIZE
+    cluster_folder = "clusters"
+    if not os.path.exists(cluster_folder):
+        os.mkdir(cluster_folder)
+    with helpers.cd(cluster_folder):
+       cluster.main(equilibration_path, "GRW", cpus=cpus)
 
     
     #MOVE FROM PDB TO MAE
